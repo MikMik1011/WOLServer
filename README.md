@@ -13,6 +13,7 @@
 
 
 ```
+DEBUG=False
 TARGET_MAC=
 SERVER_PORT=
 WOL_PORT=
@@ -22,14 +23,14 @@ NOIP_CHECK_PERIOD=
 NOIP_USERNAME=
 NOIP_PASSWORD=
 NOIP_HOSTNAME=
-SERVER_LOGIN=
+SERVER_USERNAME=
 SERVER_PASSWORD=
 ```
 
 ### The variable names are pretty much self-explanatory. 
 
 
-### Notice: If you don't want to use NOIP then change the USE_NOIP variable to anything other than "True" (it is case sensitive).
+### Note: If you don't want to use NOIP then change the USE_NOIP variable to anything other than "True" (it is case sensitive).
 
 
 ## Enjoy the script i guess!

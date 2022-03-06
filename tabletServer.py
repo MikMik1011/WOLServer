@@ -5,9 +5,11 @@ from flask import Flask, request, jsonify, make_response
 from wakeonlan import send_magic_packet
 from discord_webhook import DiscordWebhook
 from dotenv import load_dotenv, find_dotenv
-
 from threading import Event, Thread
 
+def debugPrint(args):
+    if os.getenv("DEBUG") == "True":
+        print(args)
 def call_repeatedly(interval, func, *args):
     stopped = Event()
     def loop():
@@ -27,7 +29,7 @@ oldIP = ""
 
 def updateNOIP():
     try: 
-        print("pokrenut update")
+        debugPrint("IP update check started!")
         global oldIP, webhookURL
         
         response = requests.get("https://api.myip.com/")
@@ -36,12 +38,15 @@ def updateNOIP():
         if newIP != oldIP:
             oldIP = newIP
             os.system("noipy -u {0} -p {1} -n {2} --provider noip".format(os.getenv("NOIP_USERNAME"), os.getenv("NOIP_PASSWORD"), os.getenv("NOIP_HOSTNAME")))
-            DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'DDNS IP updated, new IP is: {newIP}').execute()
+            try:
+                DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'DDNS IP updated, new IP is: {newIP}').execute()
+            except:
+                pass
         else: 
-            print("nije novi ip")
+            debugPrint("IP hasn't changed!")
 
     except:
-        print("offline")
+        debugPrint("The server is offline!")
 
 if os.getenv("USE_NOIP") == "True":
     call_repeatedly(int(os.getenv("NOIP_CHECK_PERIOD")), updateNOIP)
@@ -51,13 +56,21 @@ app = Flask(__name__)
 
 @app.route('/wol', methods=['GET'])
 def sendWOL():
-    if request.args.get("pass") == os.getenv("SERVER_PASSWORD"):
+    if not request.authorization:
+        return make_response("Hello!", 401, {'WWW-Authenticate' : 'Basic realm="Enter credentials in order to send a WOL packet!"'})
+    elif request.authorization.username == os.getenv("SERVER_USERNAME") and request.authorization.password == os.getenv("SERVER_PASSWORD"):
         send_magic_packet(mac, port = wolPort)
-        DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'WOL packet sent from following IP: {request.environ["REMOTE_ADDR"]}').execute()
+        try:
+            DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'{request.authorization.username} sent an WOL packet from the following IP: {request.environ["REMOTE_ADDR"]}').execute()
+        except:
+            pass
         return "<h1>WOL packet sent successfully!<h1>" 
     else:
-        DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'IP: {request.environ["REMOTE_ADDR"]} accessed WOL page but didn\'t type the right password!').execute()
-        return "<h1>Invalid password!<h1>"
+        try:
+            DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'IP: {request.environ["REMOTE_ADDR"]} didn\'t type the right password!').execute()
+        except:
+            pass
+        return make_response("Invalid password!", 401, {'WWW-Authenticate' : 'Basic realm="Enter credentials in order to send a WOL packet!"'})
 
 app.run(host = '0.0.0.0', port = serverPort)
 
