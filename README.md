@@ -9,7 +9,8 @@
 # Usage
 
 
-### You need to make a `.env` file. There you need to put the following variables:
+### Firstly, you need to install the required modules. List of them is in the `requirements.txt` file.
+### You also need to make a `.env` file. There you have to declare and initialize the following variables:
 
 
 ```
@@ -30,7 +31,7 @@ SERVER_PASSWORD=
 ### The variable names are pretty much self-explanatory. 
 
 
-### Note: If you don't want to use NOIP then change the USE_NOIP variable to anything other than "True" (it is case sensitive).
+### Note: If you don't want to use NOIP then change the USE_NOIP variable to anything other than "True" (it is case sensitive). Also you can turn debug on if you want.
 
 
-## Enjoy the script i guess!
+## Enjoy the script I guess!

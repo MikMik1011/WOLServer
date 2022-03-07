@@ -1,7 +1,6 @@
 import os
 import requests
-import json
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, make_response
 from wakeonlan import send_magic_packet
 from discord_webhook import DiscordWebhook
 from dotenv import load_dotenv, find_dotenv
@@ -46,7 +45,7 @@ def updateNOIP():
             debugPrint("IP hasn't changed!")
 
     except:
-        debugPrint("The server is offline!")
+        print("The server is offline!")
 
 if os.getenv("USE_NOIP") == "True":
     call_repeatedly(int(os.getenv("NOIP_CHECK_PERIOD")), updateNOIP)
