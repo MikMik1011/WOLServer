@@ -10,6 +10,14 @@ from threading import Event, Thread
 def debugPrint(args):
     if os.getenv("DEBUG") == "True":
         print(args)
+
+def srvResp(success):
+    return make_response(jsonify({
+            "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+            "success": success, 
+            }), 200 if success else 401, 
+            {'WWW-Authenticate' : 'Basic realm="Enter credentials in order to send a WOL packet!"'} if not success else {})
+
 def call_repeatedly(interval, func, *args):
     stopped = Event()
     def loop():
@@ -57,29 +65,20 @@ app = Flask(__name__)
 @app.route('/wol', methods=['GET'])
 def sendWOL():
     if not request.authorization:
-        return make_response(jsonify({
-            "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
-            "success": False, 
-            }), 401, {'WWW-Authenticate' : 'Basic realm="Enter credentials in order to send a WOL packet!"'})
+        return srvResp(False)
     elif request.authorization.username == os.getenv("SERVER_USERNAME") and request.authorization.password == os.getenv("SERVER_PASSWORD"):
         send_magic_packet(mac, port = wolPort)
         try:
             DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'{request.authorization.username} sent an WOL packet from the following IP: {request.environ["REMOTE_ADDR"]}').execute()
         except:
             pass
-        return make_response(jsonify({
-            "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
-            "success": True, 
-            }), 200) 
+        return srvResp(True) 
     else:
         try:
             DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f'IP: {request.environ["REMOTE_ADDR"]} didn\'t type the right password!').execute()
         except:
             pass
-        return make_response(jsonify({
-            "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
-            "success": False, 
-            }), 401, {'WWW-Authenticate' : 'Basic realm="Enter credentials in order to send a WOL packet!"'})
+        return srvResp(False)
 
 app.run(host = '0.0.0.0', port = serverPort)
 
