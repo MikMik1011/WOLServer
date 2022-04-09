@@ -1,6 +1,9 @@
+import time
+startTime = time.time()
+
 import os
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, request, make_response, jsonify
 from wakeonlan import send_magic_packet
 from discord_webhook import DiscordWebhook
@@ -61,6 +64,12 @@ if os.getenv("USE_NOIP") == "True":
 
 app = Flask(__name__)
 
+@app.route('/')
+def helloWorld():
+    return jsonify({"status": "online",
+    "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
+    "uptime": str(timedelta(seconds = time.time() - startTime)),
+    }) 
 
 @app.route('/wol', methods=['GET'])
 def sendWOL():
@@ -81,6 +90,3 @@ def sendWOL():
         return srvResp(False)
 
 app.run(host = '0.0.0.0', port = serverPort)
-
-
-
