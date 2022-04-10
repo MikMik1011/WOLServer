@@ -1,3 +1,4 @@
+from asyncio import subprocess
 import time
 startTime = time.time()
 
@@ -109,6 +110,12 @@ def helloWorld():
     "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
     "uptime": str(timedelta(seconds = time.time() - startTime)),
     }) 
+
+@app.route('/termux')
+def termuxEndpoint():
+    return jsonify({
+        "battery" : subprocess.check_output(["termux-battery-status"]).decode("utf-8")
+    })
 
 @app.route('/wol', methods=['GET'])
 def sendWOL():
