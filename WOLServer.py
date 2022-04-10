@@ -28,19 +28,20 @@ webhookURL = os.getenv("WEBHOOK_URL")
 oldIP = ""
 
 def log(args):
-    currTime = datetime.now().strftime("%H:%M:%S") 
+    currTime = datetime.now().strftime("%H:%M:%S")
+    logString = f"[{currTime}] {args}"
 
-    print(f"[{currTime}] {args}") 
+    print(logString) 
 
     if os.getenv("LOG_TO_FILE") == "True":
         try:
             with open("wolserver.log", "a") as logFile: 
-                logFile.write(f"[{currTime}] {args}\n") 
+                logFile.write(f"{logString}\n")
         except:
             pass
 
     try:
-        DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=f"[{currTime}] {args}").execute() 
+        DiscordWebhook(url=webhookURL, rate_limit_retry=True, content=logString).execute() 
     except:
         pass
 
