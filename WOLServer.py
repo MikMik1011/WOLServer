@@ -113,9 +113,7 @@ def helloWorld():
 
 @app.route('/termux')
 def termuxEndpoint():
-    return jsonify({
-        "battery" : subprocess.check_output(["termux-battery-status"]).decode("utf-8")
-    })
+    return subprocess.check_output(["termux-battery-status"]).decode("utf-8")
 
 @app.route('/wol', methods=['GET'])
 def sendWOL():
