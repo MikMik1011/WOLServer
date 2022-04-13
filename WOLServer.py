@@ -55,7 +55,7 @@ def updateNOIP():
 
         if newIP != oldIP:
             oldIP = newIP
-            noipyOutput = subprocess.check_output("noipy -u {0} -p {1} -n {2} --provider noip".format(os.getenv("NOIP_USERNAME"), os.getenv("NOIP_PASSWORD"), os.getenv("NOIP_HOSTNAME")))
+            noipyOutput = subprocess.check_output("noipy -u {0} -p {1} -n {2} --provider noip".format(os.getenv("NOIP_USERNAME"), os.getenv("NOIP_PASSWORD"), os.getenv("NOIP_HOSTNAME")), shell=True)
             werkzeugLogger.info(noipyOutput.decode("utf-8"))
         else: 
             werkzeugLogger.debug("IP hasn't changed!")
