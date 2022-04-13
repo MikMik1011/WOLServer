@@ -1,6 +1,6 @@
-discord_webhook==0.14.0
+discord_handler==0.0.3
 Flask==2.0.2
 noipy==1.5.3
-python-dotenv==0.19.2
+python-dotenv==0.20.0
 requests==2.26.0
 wakeonlan==2.1.0
